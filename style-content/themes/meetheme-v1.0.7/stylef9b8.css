@@ -1,0 +1,20 @@
+/*
+Theme Name: MeeTheme
+Theme URI: http://nrgthemes.com
+Version: 1.0.5
+Description: Mee is clean, minimal and professional looking resume wordpress theme. A brand new resume wordpress theme with unique style is here. This theme is suitable for anyone who wants to have a personalized resume website with unique style, layout and colors.
+Author: NRGthemes
+Author URI: http://nrgthemes.com
+License: GNU General Public License version 3.0
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
+Tags: one-column, two-columns, right-sidebar, fluid-layout, custom-menu, editor-style, featured-images, post-formats, sticky-post, translation-ready
+*/
+
+.wp-caption {}
+.wp-caption-text{}
+.sticky{box-shadow: 0 0px 15px rgba(255, 204, 0, 0.5) !important; }
+.gallery-caption{}
+.alignright{text-align: right;}
+.bypostauthor{}
+.aligncenter{text-align: center;}
+.alignleft{text-align: left;}
