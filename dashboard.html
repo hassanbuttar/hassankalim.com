@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Logs Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Visitor Logs Dashboard</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>IP</th>
+                <th>City</th>
+                <th>Region</th>
+                <th>Country</th>
+                <th>Location</th> <!-- Changed from Lat/Long to a single column -->
+                <th>ISP</th>
+                <th>Timezone</th>
+                <th>User Agent</th>
+                <th>Referrer</th>
+                <th>Screen Width</th>
+                <th>Screen Height</th>
+                <th>Visit Time</th>
+            </tr>
+        </thead>
+        <tbody id="visitorTable">
+            <tr>
+                <td colspan="13">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Redirect to login if not authenticated
+        if (!localStorage.getItem("authToken")) {
+            window.location.href = "/login.html";
+        }
+        async function fetchVisitors() {
+            try {
+                const token = localStorage.getItem("authToken");
+                let response = await fetch("https://hassankalim.com/api/getprofiles", {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                let data = await response.json();
+
+                let tableBody = document.getElementById("visitorTable");
+                tableBody.innerHTML = "";  // Clear previous rows
+
+                data.forEach(visitor => {
+                    let mapsUrl = `https://www.google.com/maps?q=${visitor.latitude},${visitor.longitude}`;
+                    let row = `<tr>
+                        <td>${visitor.id}</td>
+                        <td>${visitor.ip}</td>
+                        <td>${visitor.city}</td>
+                        <td>${visitor.region}</td>
+                        <td>${visitor.country}</td>
+                        <td><a href="${mapsUrl}" target="_blank">📍 Open in Maps</a></td>  <!-- Clickable Google Maps link -->
+                        <td>${visitor.isp}</td>
+                        <td>${visitor.timezone}</td>
+                        <td>${visitor.user_agent}</td>
+                        <td>${visitor.referrer}</td>
+                        <td>${visitor.screen_width}</td>
+                        <td>${visitor.screen_height}</td>
+                        <td>${visitor.visit_time}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+
+            } catch (error) {
+                console.error("Error fetching visitor logs:", error);
+            }
+        }
+
+        fetchVisitors();  // Load data on page load
+    </script>
+
+</body>
+
+</html>

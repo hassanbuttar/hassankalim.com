@@ -7,7 +7,7 @@
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Hasan Kalim - System Architect and Software Engineer</title>
-    <link rel="profile" href="http://hassankalim.com" />
+    <link rel="profile" href="https://hassankalim.com" />
     <link rel="pingback" href="index.html" />
     <meta name="viewport" content="width=device-width">
     <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.html">
@@ -27,7 +27,7 @@
             top: 220px !important;
         }
     </style>
-    <link rel='stylesheet' id='Roboto-Fonts-css' href='http://fonts.googleapis.com/css?family=Roboto%3A400%2C300italic%2C300%2C100italic%2C100%2C400italic%2C500%2C500italic%2C700%2C900%2C900italic%2C700italic%7COswald%3A400%2C300%2C700&amp;ver=1.0.0.0'
+    <link rel='stylesheet' id='Roboto-Fonts-css' href='https://fonts.googleapis.com/css?family=Roboto%3A400%2C300italic%2C300%2C100italic%2C100%2C400italic%2C500%2C500italic%2C700%2C900%2C900italic%2C700italic%7COswald%3A400%2C300%2C700&amp;ver=1.0.0.0'
           type='text/css' media='screen' />
     <link rel='stylesheet' id='font-awesome-css' href='style-content/themes/meetheme-v1.0.7/assets/css/font-awesomef9b8.css?ver=4.0'
           type='text/css' media='all' />
@@ -53,7 +53,7 @@
           type='text/css' media='screen' />
     <link rel='stylesheet' id='js_composer_custom_css-css' href='style-content/uploads/js_composer/custom7035.css?ver=4.3.4' type='text/css'
           media='screen' />
-    <link rel='stylesheet' id='redux-google-fonts-css' href='http://fonts.googleapis.com/css?family=Roboto%7COswald&amp;ver=1420390637'
+    <link rel='stylesheet' id='redux-google-fonts-css' href='https://fonts.googleapis.com/css?family=Roboto%7COswald&amp;ver=1420390637'
           type='text/css' media='all' />
     <script type='text/javascript' src='wp-includes/js/jquery/jquery90f9.js?ver=1.11.1'></script>
     <script type='text/javascript' src='wp-includes/js/jquery/jquery-migrate.min1576.js?ver=1.2.1'></script>
@@ -150,27 +150,110 @@
             cursor: progress;
         }
     </style>
-    <!-- Begin Inspectlet Asynchronous Code -->
-    <script type="text/javascript">
-        (function () {
-            window.__insp = window.__insp || [];
-            __insp.push(['wid', 1954454568]);
-            var ldinsp = function () {
-                if (typeof window.__inspld != "undefined") return; window.__inspld = 1; var insp = document.createElement('script'); insp.type = 'text/javascript'; insp.async = true; insp.id = "inspsync"; insp.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://cdn.inspectlet.com/inspectlet.js?wid=1954454568&r=' + Math.floor(new Date().getTime() / 3600000); var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(insp, x);
-            };
-            setTimeout(ldinsp, 0);
-        })();
-    </script>
-    <!-- End Inspectlet Asynchronous Code -->
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HECF39HLSQ"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
+<script>
+    (async function() {
+        try {
+            // Function to send visitor data to the server
+            async function sendVisitorData(visitorData) {
+                try {
+                    await fetch("https://hassankalim.com/api/updateprofile", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(visitorData)
+                    });
+                    console.log("Visitor data sent:", visitorData);
+                } catch (error) {
+                    console.error("Error sending visitor data:", error);
+                }
+            }
 
-        gtag('config', 'G-HECF39HLSQ');
-    </script>
+            // Fetch IP-based location
+            async function getIPBasedLocation() {
+                try {
+                    const res = await fetch("https://ipapi.co/json/");
+                    const data = await res.json();
+                    return {
+                        ip: data.ip,
+                        city: data.city,
+                        region: data.region,
+                        country: data.country_name,
+                        latitude: data.latitude,  // IP-based (less accurate)
+                        longitude: data.longitude, // IP-based (less accurate)
+                        isp: data.org,
+                        timezone: data.timezone
+                    };
+                } catch (error) {
+                    console.error("Error fetching IP-based location:", error);
+                    return null;
+                }
+            }
+
+            // Try to get precise geolocation
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    console.log("✅ Geolocation granted.");
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const ipLocation = await getIPBasedLocation();
+
+                    const visitorData = {
+                        ip: ipLocation?.ip || "Unknown",
+                        city: ipLocation?.city || "Unknown",
+                        region: ipLocation?.region || "Unknown",
+                        country: ipLocation?.country || "Unknown",
+                        latitude: lat,  // Use browser's precise location
+                        longitude: lon, // Use browser's precise location
+                        isp: ipLocation?.isp || "Unknown",
+                        timezone: ipLocation?.timezone || "Unknown",
+                        userAgent: navigator.userAgent,
+                        referrer: document.referrer,
+                        screenWidth: screen.width,
+                        screenHeight: screen.height
+                    };
+
+                    await sendVisitorData(visitorData);
+
+                }, async (error) => {
+                    console.warn("❌ Geolocation denied. Falling back to IP-based location.");
+                    const ipLocation = await getIPBasedLocation();
+
+                    if (ipLocation) {
+                        const visitorData = {
+                            ip: ipLocation.ip,
+                            city: ipLocation.city,
+                            region: ipLocation.region,
+                            country: ipLocation.country,
+                            latitude: ipLocation.latitude,  // Less accurate (data center)
+                            longitude: ipLocation.longitude, // Less accurate (data center)
+                            isp: ipLocation.isp,
+                            timezone: ipLocation.timezone,
+                            userAgent: navigator.userAgent,
+                            referrer: document.referrer,
+                            screenWidth: screen.width,
+                            screenHeight: screen.height
+                        };
+                        await sendVisitorData(visitorData);
+                    } else {
+                        console.error("❌ Both geolocation & IP-based location failed.");
+                    }
+                });
+            } else {
+                console.warn("❌ Geolocation not supported.");
+                const ipLocation = await getIPBasedLocation();
+                if (ipLocation) {
+                    await sendVisitorData(ipLocation);
+                }
+            }
+
+        } catch (error) {
+            console.error("Unexpected error:", error);
+        }
+    })();
+</script>
+
+    
 </head>
 
 <body class="home page page-id-7 page-template page-template-page-templatesone-page-php wpb-js-composer js-comp-ver-4.3.4 vc_responsive">
@@ -229,11 +312,12 @@
                 <!-- Introduction -->
                 <article class="content introduction noscroll" id="chapterintroduction">
                     <div class="inner">
+                        <h1>Welcome!</h1>
                         <h2>
                             <span>HEllo, I'm</span>
                             <br>Hasan Kalim
                         </h2>
-                        <span class="title">Software Engineer</span>
+                        <span class="title">Solution Architect</span>
                     </div>
                     <div id="owl-demo" class="owl-carousel">
                         <div class="item">
@@ -243,7 +327,7 @@
               <div class="item"><img src="style-content/themes/meetheme-v1.0.7/assets/images/IMG_8653.jpg" alt="" /></div>-->
                     </div>
                 </article>
-                <article class="content about white-bg page-half" id="chapterabout" style="background-image:url(http://errors.stablehost.com/406.php);background-repeat: no-repeat;">
+                <article class="content about white-bg page-half" id="chapterabout" style="background-image:url(https://errors.stablehost.com/406.php);background-repeat: no-repeat;">
                     <div class="inner">
                         <div class="page-title">
                             <h2>About</h2>
@@ -554,7 +638,7 @@
                                             </div>
                                         </div>
                                         <div class="col-6 margin-bottom50 margin-top50">
-                                            At Seer Solutions, a leading Fintech company, I have excelled as a System Architect. Notably, I played a pivotal role in developing and <a href="http://www.seersolutionz.com/media/launch-of-enterprise-payment-hub" style="color:lightseagreen;">launching</a> the "Enterprise Payment Hub" system, a state-of-the-art Open API-based backend solution employing DevOps practices and a Microservices architecture in .Net Core. This system powers multiple live products, including Mobile Wallet, International Money Transfer, UNICEF financial aid distribution through Agent Networks, User Management, and Accounting Ledger. Technologies utilized encompass ASP.Net Core, Angular 2, Docker, RabbitMQ, nLog, OAuth 2.0, Unity, Dapper, Swagger, Memcache, Android, and iOS.
+                                            At Seer Solutions, a leading Fintech company, I have excelled as a System Architect. Notably, I played a pivotal role in developing and <a href="https://www.seersolutionz.com/media/launch-of-enterprise-payment-hub" style="color:lightseagreen;">launching</a> the "Enterprise Payment Hub" system, a state-of-the-art Open API-based backend solution employing DevOps practices and a Microservices architecture in .Net Core. This system powers multiple live products, including Mobile Wallet, International Money Transfer, UNICEF financial aid distribution through Agent Networks, User Management, and Accounting Ledger. Technologies utilized encompass ASP.Net Core, Angular 2, Docker, RabbitMQ, nLog, OAuth 2.0, Unity, Dapper, Swagger, Memcache, Android, and iOS.
 
                                             My role also involves implementing Continuous Integration/Continuous Deployment (CI/CD) for Azure Web Apps and Containers, contributing to the seamless deployment and management of our products.
                                         </div>
@@ -747,7 +831,7 @@
                                         <h3>Send Me a Message</h3>
                                         <div class="wpcf7" id="wpcf7-f6-p7-o1" lang="en-US" dir="ltr">
                                             <div class="screen-reader-response"></div>
-                                            <form name="contactForm" action="http://hassankalim.com/contact-form-handler.php" method="post" class="wpcf7-form">
+                                            <form name="contactForm" action="https://hassankalim.com/contact-form-handler.php" method="post" class="wpcf7-form">
                                                 <p>
                                                     <span class="wpcf7-form-control-wrap your-name">
                                                         <input type="text" name="name" value="" size="40" class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required" id="name"
