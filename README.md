@@ -7,6 +7,8 @@ Static portfolio website for Hasan Buttar, deployed on GitHub Pages at https://h
 - `index.html` - main portfolio page
 - `assets/site.css` - custom responsive styling
 - `assets/site.js` - small navigation/year helper
+- `assets/favicon.svg` - site icon
+- `assets/hasan-buttar-profile.jpg` - profile portrait
 - `robots.txt` and `sitemap.xml` - search engine metadata
 
 The current homepage is intentionally dependency-free: no build step, no tracking script, and no WordPress runtime.
