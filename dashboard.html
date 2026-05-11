@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>User Records Dashboard | Hasan Buttar Lab</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Hasan Buttar home">
+      <span class="brand-mark">HB</span>
+      <span>Hasan Buttar Lab</span>
+    </a>
+    <nav class="site-nav" aria-label="Dashboard navigation">
+      <a href="/">Website</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-shell">
+    <section class="dashboard-header" aria-labelledby="dashboard-title">
+      <div>
+        <p class="section-kicker">Pen Test Lab</p>
+        <h1 id="dashboard-title">User Records Dashboard</h1>
+        <p class="hero-text">Retrieves authorized lab telemetry from <code>https://api.hasanbuttar.com/getuserrecords</code>.</p>
+      </div>
+      <div class="dashboard-controls">
+        <input id="dashboard-token" type="password" autocomplete="off" placeholder="Optional bearer token">
+        <button class="button primary" type="button" id="load-records">Load Records</button>
+      </div>
+    </section>
+
+    <section class="dashboard-summary" aria-label="Dashboard summary">
+      <article>
+        <strong id="record-count">0</strong>
+        <span>Total records</span>
+      </article>
+      <article>
+        <strong id="located-count">0</strong>
+        <span>Records with coordinates</span>
+      </article>
+      <article>
+        <strong id="latest-record">-</strong>
+        <span>Latest capture</span>
+      </article>
+    </section>
+
+    <section class="dashboard-table-wrap" aria-label="User records">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th>Captured</th>
+            <th>Consent</th>
+            <th>Location</th>
+            <th>Accuracy</th>
+            <th>Timezone</th>
+            <th>Language</th>
+            <th>Page</th>
+            <th>Referrer</th>
+            <th>User Agent</th>
+          </tr>
+        </thead>
+        <tbody id="records-body">
+          <tr>
+            <td class="dashboard-empty" colspan="9">Load records to view lab telemetry.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="assets/dashboard.js" defer></script>
+</body>
+</html>
