@@ -1,11 +1,24 @@
-const GET_USER_RECORDS_ENDPOINT = "https://api.hasanbuttar.com/getuserrecords";
+const API_BASE_URL = "https://api.hasanbuttar.com/api";
+const GET_USER_RECORDS_ENDPOINT = `${API_BASE_URL}/getprofiles`;
+const LOGIN_PAGE = "login.html";
 
 const loadButton = document.querySelector("#load-records");
-const tokenInput = document.querySelector("#dashboard-token");
+const logoutButton = document.querySelector("#logout");
 const tableBody = document.querySelector("#records-body");
 const recordCount = document.querySelector("#record-count");
 const locatedCount = document.querySelector("#located-count");
 const latestRecord = document.querySelector("#latest-record");
+const dashboardUser = document.querySelector("#dashboard-user");
+
+const token = sessionStorage.getItem("labDashboardToken");
+
+if (!token) {
+  window.location.href = LOGIN_PAGE;
+}
+
+if (dashboardUser) {
+  dashboardUser.textContent = "Signed in";
+}
 
 function readPath(record, path, fallback = "") {
   return path.split(".").reduce((value, key) => {
@@ -49,8 +62,8 @@ function setCell(row, value) {
 
 function renderLocation(row, record) {
   const cell = document.createElement("td");
-  const latitude = readPath(record, "location.latitude", record.latitude);
-  const longitude = readPath(record, "location.longitude", record.longitude);
+  const latitude = record.latitude;
+  const longitude = record.longitude;
 
   if (latitude === "" || longitude === "" || latitude === undefined || longitude === undefined) {
     cell.textContent = "-";
@@ -80,26 +93,26 @@ function renderRecords(records) {
   }
 
   const located = records.filter((record) => {
-    const latitude = readPath(record, "location.latitude", record.latitude);
-    const longitude = readPath(record, "location.longitude", record.longitude);
+    const latitude = record.latitude;
+    const longitude = record.longitude;
     return latitude !== "" && longitude !== "" && latitude !== undefined && longitude !== undefined;
   });
 
   recordCount.textContent = records.length.toString();
   locatedCount.textContent = located.length.toString();
-  latestRecord.textContent = formatDate(readPath(records[0] || {}, "capturedAt", readPath(records[0] || {}, "createdAt", "")));
+  latestRecord.textContent = formatDate(readPath(records[0] || {}, "visit_time", ""));
 
   records.forEach((record) => {
     const row = document.createElement("tr");
-    setCell(row, formatDate(readPath(record, "capturedAt", readPath(record, "createdAt", ""))));
-    setCell(row, `${readPath(record, "consentStatus", "-")} / ${readPath(record, "geolocationStatus", "-")}`);
+    setCell(row, formatDate(record.visit_time));
+    setCell(row, record.country ? `${record.city || "-"}, ${record.country}` : "-");
     renderLocation(row, record);
-    setCell(row, readPath(record, "location.accuracy", readPath(record, "accuracy", "")));
-    setCell(row, readPath(record, "timezone", ""));
-    setCell(row, readPath(record, "language", ""));
-    setCell(row, readPath(record, "pageUrl", readPath(record, "pagePath", "")));
-    setCell(row, readPath(record, "referrer", ""));
-    setCell(row, readPath(record, "userAgent", ""));
+    setCell(row, record.ip);
+    setCell(row, record.isp);
+    setCell(row, record.timezone);
+    setCell(row, `${record.screen_width || "-"} x ${record.screen_height || "-"}`);
+    setCell(row, record.referrer);
+    setCell(row, record.user_agent);
     tableBody.appendChild(row);
   });
 }
@@ -109,14 +122,18 @@ async function loadRecords() {
   loadButton.textContent = "Loading...";
 
   try {
-    const headers = {};
-    const token = tokenInput.value.trim();
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-      sessionStorage.setItem("dashboardBearerToken", token);
+    const response = await fetch(GET_USER_RECORDS_ENDPOINT, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      sessionStorage.removeItem("labDashboardToken");
+      window.location.href = LOGIN_PAGE;
+      return;
     }
 
-    const response = await fetch(GET_USER_RECORDS_ENDPOINT, { headers });
     if (!response.ok) {
       throw new Error(`Backend returned ${response.status}`);
     }
@@ -138,10 +155,14 @@ async function loadRecords() {
   }
 }
 
-if (tokenInput) {
-  tokenInput.value = sessionStorage.getItem("dashboardBearerToken") || "";
-}
-
 if (loadButton) {
   loadButton.addEventListener("click", loadRecords);
+  loadRecords();
+}
+
+if (logoutButton) {
+  logoutButton.addEventListener("click", () => {
+    sessionStorage.removeItem("labDashboardToken");
+    window.location.href = LOGIN_PAGE;
+  });
 }

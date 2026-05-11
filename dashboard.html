@@ -24,11 +24,12 @@
       <div>
         <p class="section-kicker">Pen Test Lab</p>
         <h1 id="dashboard-title">User Records Dashboard</h1>
-        <p class="hero-text">Retrieves authorized lab telemetry from <code>https://api.hasanbuttar.com/getuserrecords</code>.</p>
+        <p class="hero-text">Retrieves authorized lab telemetry from <code>https://api.hasanbuttar.com/api/getprofiles</code>.</p>
       </div>
       <div class="dashboard-controls">
-        <input id="dashboard-token" type="password" autocomplete="off" placeholder="Optional bearer token">
+        <span id="dashboard-user" class="dashboard-user">Checking session...</span>
         <button class="button primary" type="button" id="load-records">Load Records</button>
+        <button class="button secondary" type="button" id="logout">Sign Out</button>
       </div>
     </section>
 
@@ -52,12 +53,12 @@
         <thead>
           <tr>
             <th>Captured</th>
-            <th>Consent</th>
+            <th>Location Text</th>
             <th>Location</th>
-            <th>Accuracy</th>
+            <th>IP</th>
+            <th>ISP</th>
             <th>Timezone</th>
-            <th>Language</th>
-            <th>Page</th>
+            <th>Screen</th>
             <th>Referrer</th>
             <th>User Agent</th>
           </tr>

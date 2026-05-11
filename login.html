@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Lab Login | Hasan Buttar</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <main class="login-shell">
+    <section class="login-panel" aria-labelledby="login-title">
+      <a class="brand" href="/" aria-label="Hasan Buttar home">
+        <span class="brand-mark">HB</span>
+        <span>Hasan Buttar Lab</span>
+      </a>
+      <p class="section-kicker">Protected Dashboard</p>
+      <h1 id="login-title">Sign in to view user records</h1>
+      <p class="hero-text">Use the lab credentials configured on the API server.</p>
+      <form id="login-form" class="login-form">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" required>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button class="button primary" type="submit">Sign In</button>
+        <p id="login-status" class="lab-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="assets/login.js" defer></script>
+</body>
+</html>

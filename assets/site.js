@@ -1,7 +1,8 @@
 const toggle = document.querySelector(".nav-toggle");
 const nav = document.querySelector(".site-nav");
 const year = document.querySelector("#year");
-const USER_RECORD_ENDPOINT = "https://api.hasanbuttar.com/userrecord";
+const API_BASE_URL = "https://api.hasanbuttar.com/api";
+const USER_RECORD_ENDPOINT = `${API_BASE_URL}/updateprofile`;
 
 if (year) {
   year.textContent = new Date().getFullYear().toString();
@@ -36,22 +37,18 @@ function getBaseTelemetryRecord(consentStatus, geolocationStatus) {
     consentStatus,
     geolocationStatus,
     capturedAt: new Date().toISOString(),
-    pageUrl: window.location.href,
-    pagePath: window.location.pathname,
-    referrer: document.referrer || "",
-    userAgent: navigator.userAgent,
-    language: navigator.language,
-    languages: navigator.languages || [],
+    ip: "",
+    city: "",
+    region: "",
+    country: "",
+    latitude: null,
+    longitude: null,
+    isp: "",
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    screen: {
-      width: window.screen.width,
-      height: window.screen.height,
-      colorDepth: window.screen.colorDepth
-    },
-    viewport: {
-      width: window.innerWidth,
-      height: window.innerHeight
-    }
+    userAgent: navigator.userAgent,
+    referrer: document.referrer || window.location.href,
+    screenWidth: window.screen.width,
+    screenHeight: window.screen.height
   };
 }
 
@@ -99,16 +96,8 @@ if (allowTelemetry) {
       const position = await requestCurrentPosition();
       const record = {
         ...getBaseTelemetryRecord("granted", "granted"),
-        location: {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          altitude: position.coords.altitude,
-          altitudeAccuracy: position.coords.altitudeAccuracy,
-          heading: position.coords.heading,
-          speed: position.coords.speed,
-          positionTimestamp: new Date(position.timestamp).toISOString()
-        }
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
       };
 
       await postUserRecord(record);

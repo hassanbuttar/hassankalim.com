@@ -465,6 +465,7 @@ h3 {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .dashboard-controls input {
@@ -474,6 +475,11 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 8px;
   font: inherit;
+}
+
+.dashboard-user {
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .dashboard-summary {
@@ -534,6 +540,50 @@ h3 {
   padding: 28px;
   color: var(--muted);
   text-align: center;
+}
+
+.login-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 32px 20px;
+  background: var(--soft);
+}
+
+.login-panel {
+  width: min(540px, 100%);
+  padding: 34px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.login-panel .brand {
+  margin-bottom: 34px;
+}
+
+.login-panel h1 {
+  font-size: 2.7rem;
+}
+
+.login-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.login-form label {
+  color: var(--ink);
+  font-weight: 850;
+}
+
+.login-form input {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
 }
 
 .social-links {
