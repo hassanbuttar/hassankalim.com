@@ -1,34 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>Lab Login | Hasan Buttar</title>
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/site.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Visitor Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        form { padding: 20px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
+        input { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+        button { padding: 10px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+    </style>
 </head>
 <body>
-  <main class="login-shell">
-    <section class="login-panel" aria-labelledby="login-title">
-      <a class="brand" href="/" aria-label="Hasan Buttar home">
-        <span class="brand-mark">HB</span>
-        <span>Hasan Buttar Lab</span>
-      </a>
-      <p class="section-kicker">Protected Dashboard</p>
-      <h1 id="login-title">Sign in to view user records</h1>
-      <p class="hero-text">Use the lab credentials configured on the API server.</p>
-      <form id="login-form" class="login-form">
-        <label for="username">Username</label>
-        <input id="username" name="username" type="text" autocomplete="username" required>
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" required>
-        <button class="button primary" type="submit">Sign In</button>
-        <p id="login-status" class="lab-status" role="status" aria-live="polite"></p>
-      </form>
-    </section>
-  </main>
 
-  <script src="assets/login.js" defer></script>
+    <h2>Login to Dashboard</h2>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            if (data.status === "success") {
+                localStorage.setItem("authToken", data.token); // Save token in local storage
+                window.location.href = "/dashboard.html"; // Redirect to dashboard
+            } else {
+                alert("Invalid credentials. Try again.");
+            }
+        });
+    </script>
+
 </body>
 </html>

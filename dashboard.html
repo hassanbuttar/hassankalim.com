@@ -1,77 +1,126 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>User Records Dashboard | Hasan Buttar Lab</title>
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/site.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Logs Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        a {
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="/" aria-label="Hasan Buttar home">
-      <span class="brand-mark">HB</span>
-      <span>Hasan Buttar Lab</span>
-    </a>
-    <nav class="site-nav" aria-label="Dashboard navigation">
-      <a href="/">Website</a>
-    </nav>
-  </header>
 
-  <main class="dashboard-shell">
-    <section class="dashboard-header" aria-labelledby="dashboard-title">
-      <div>
-        <p class="section-kicker">Pen Test Lab</p>
-        <h1 id="dashboard-title">User Records Dashboard</h1>
-        <p class="hero-text">Retrieves authorized lab telemetry from <code>https://api.hasanbuttar.com/api/getprofiles</code>.</p>
-      </div>
-      <div class="dashboard-controls">
-        <span id="dashboard-user" class="dashboard-user">Checking session...</span>
-        <button class="button primary" type="button" id="load-records">Load Records</button>
-        <button class="button secondary" type="button" id="logout">Sign Out</button>
-      </div>
-    </section>
-
-    <section class="dashboard-summary" aria-label="Dashboard summary">
-      <article>
-        <strong id="record-count">0</strong>
-        <span>Total records</span>
-      </article>
-      <article>
-        <strong id="located-count">0</strong>
-        <span>Records with coordinates</span>
-      </article>
-      <article>
-        <strong id="latest-record">-</strong>
-        <span>Latest capture</span>
-      </article>
-    </section>
-
-    <section class="dashboard-table-wrap" aria-label="User records">
-      <table class="dashboard-table">
-        <thead>
-          <tr>
-            <th>Captured</th>
-            <th>Location Text</th>
-            <th>Location</th>
+<h2>Visitor Logs Dashboard</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
             <th>IP</th>
+            <th>City</th>
+            <th>Region</th>
+            <th>Country</th>
+            <th>Location</th>
             <th>ISP</th>
             <th>Timezone</th>
-            <th>Screen</th>
-            <th>Referrer</th>
             <th>User Agent</th>
-          </tr>
-        </thead>
-        <tbody id="records-body">
-          <tr>
-            <td class="dashboard-empty" colspan="9">Load records to view lab telemetry.</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-  </main>
+            <th>Referrer</th>
+            <th>Screen Width</th>
+            <th>Screen Height</th>
+            <th>Visit Time</th>
+        </tr>
+    </thead>
+    <tbody id="visitorTable">
+        <tr>
+            <td colspan="13">Loading...</td>
+        </tr>
+    </tbody>
+</table>
 
-  <script src="assets/dashboard.js" defer></script>
+<script>
+    // Redirect to login if not authenticated
+    if (!localStorage.getItem("authToken")) {
+        window.location.href = "/login.html";
+    }
+
+    async function fetchVisitors() {
+        try {
+            const token = localStorage.getItem("authToken");
+            const response = await fetch("https://hassankalim.com/api/getprofiles", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            
+            // Convert response to JSON
+            const data = await response.json();
+            
+            // Check if we got the "Invalid token" error
+            if (data.status === "error" && data.message === "Invalid token") {
+                window.location.href = "/login.html";
+                return; // Stop here, don’t render table
+            }
+            
+            let tableBody = document.getElementById("visitorTable");
+            tableBody.innerHTML = "";  // Clear previous rows
+
+            // Assuming data is an array of visitors if the token is valid
+            data.forEach(visitor => {
+                const mapsUrl = `https://www.google.com/maps?q=${visitor.latitude},${visitor.longitude}`;
+                const row = `
+                    <tr>
+                        <td>${visitor.id}</td>
+                        <td>${visitor.ip}</td>
+                        <td>${visitor.city}</td>
+                        <td>${visitor.region}</td>
+                        <td>${visitor.country}</td>
+                        <td><a href="${mapsUrl}" target="_blank">📍 Open in Maps</a></td>
+                        <td>${visitor.isp}</td>
+                        <td>${visitor.timezone}</td>
+                        <td>${visitor.user_agent}</td>
+                        <td>${visitor.referrer}</td>
+                        <td>${visitor.screen_width}</td>
+                        <td>${visitor.screen_height}</td>
+                        <td>${visitor.visit_time}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+            
+        } catch (error) {
+            console.error("Error fetching visitor logs:", error);
+        }
+    }
+
+    // Load data on page load
+    fetchVisitors();
+</script>
+
 </body>
 </html>
