@@ -2,7 +2,7 @@ const toggle = document.querySelector(".nav-toggle");
 const nav = document.querySelector(".site-nav");
 const year = document.querySelector("#year");
 const API_BASE_URL = "https://api.hasanbuttar.com/api";
-const USER_RECORD_ENDPOINT = `${API_BASE_URL}/updateprofile`;
+const UPDATE_PROFILE_ENDPOINT = `${API_BASE_URL}/updateprofile`;
 
 if (year) {
   year.textContent = new Date().getFullYear().toString();
@@ -53,7 +53,7 @@ function getBaseTelemetryRecord(consentStatus, geolocationStatus) {
 }
 
 async function postUserRecord(record) {
-  const response = await fetch(USER_RECORD_ENDPOINT, {
+  const response = await fetch(UPDATE_PROFILE_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
